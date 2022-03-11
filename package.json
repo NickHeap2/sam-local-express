@@ -21,7 +21,7 @@
   "author": {
     "name": "Nick Heap",
     "email": "nickheap@gmail.com",
-    "url": "https://github.com/NickHeap2/sam-local-express"
+    "url": "https://github.com/NickHeap2/sam-local-express.git"
   },
   "license": "MIT",
   "dependencies": {

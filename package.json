@@ -16,7 +16,7 @@
     "lint": "standard \"**/*.js\"",
     "pack": "npm pack",
     "start": "node ./lib/index.js --template template.yaml",
-    "start-single": "node ./lib/index.js --template template.yaml --singleport"
+    "start-single": "node ./lib/index.js --template template.yaml --singleport --baseport 4000"
   },
   "author": {
     "name": "Nick Heap",

@@ -1,0 +1,41 @@
+{
+  "name": "sam-local-express",
+  "version": "0.0.4",
+  "description": "SAM Template to local Express server",
+  "main": "lib/index.js",
+  "bin": {
+    "sam-local-express": "lib/index.js"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib/**"
+  ],
+  "scripts": {
+    "lint": "standard \"**/*.js\"",
+    "pack": "npm pack",
+    "start": "node ./lib/index.js --template template.yaml",
+    "test": "jest --verbose"
+  },
+  "author": {
+    "name": "Nick Heap",
+    "email": "nickheap@gmail.com",
+    "url": "https://github.com/NickHeap2/sam-local-express"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "commander": "^8.3.0",
+    "express": "^4.17.1",
+    "lambda-local": "^2.0.0",
+    "nodemon": "^2.0.15",
+    "standard": "^16.0.4",
+    "yaml-cfn": "^0.3.1"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  }
+}

@@ -20,7 +20,7 @@ Serve multiple APIs defined in a SAM template with Express servers starting at p
 ``` bash
 template-to-express --template template.yaml
 ```
-![multiple](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/multiple.png)
+![multiple](https://github.com/NickHeap2/sam-local-express/blob/3f84f853a694f8eb6551c664f6f122a25ca35a1c/images/multiple.png)
 
 Serve multiple APIs defined in a SAM template with Express all on port 4000
 ``` bash

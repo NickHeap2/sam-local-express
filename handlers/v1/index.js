@@ -1,20 +1,30 @@
 module.exports = {
   testGet,
   testPost,
-  scheduledPost
+  scheduledPost,
+  pathParamTestGet
 }
 
 async function testGet (event) {
   await new Promise(resolve => setTimeout(resolve, 1000))
-  return getResponse(Object.values(this)[0].name)
+  return getResponse('testGet')
 }
 
 async function testPost (event) {
-  return getResponse(Object.values(this)[0].name)
+  return getResponse('testPost')
 }
 
 async function scheduledPost (event) {
-  return getResponse(Object.values(this)[0].name)
+  return getResponse('scheduledPost')
+}
+
+async function pathParamTestGet (event) {
+  const pathParameters = event.pathParameters
+
+  const response = getResponse('pathParamTestGet')
+  response.body = response.body.replace('OK', pathParameters.pathParam)
+
+  return response
 }
 
 function getResponse (thisFunction) {

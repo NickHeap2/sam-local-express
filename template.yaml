@@ -107,6 +107,19 @@ Resources:
             Method: get
             ApiId: !Ref TestHttpApiv2
 
+  # functions
+  pathParamTestGet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.pathParamTestGet
+      Events:
+        Apiv1:
+          Type: HttpApi
+          Properties:
+            Path: /{pathParam}/test/
+            Method: get
+            ApiId: !Ref TestHttpApiv1
+
   testPost:
     Type: AWS::Serverless::Function
     Properties:

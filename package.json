@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.4",
+  "version": "0.0.9",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -23,6 +23,13 @@
     "email": "nickheap@gmail.com",
     "url": "https://github.com/NickHeap2/sam-local-express.git"
   },
+  "keywords": [
+    "api",
+    "api testing",
+    "aws sam",
+    "local",
+    "express"
+  ],
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.1",

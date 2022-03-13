@@ -3,6 +3,7 @@ Transform: "AWS::Serverless-2016-10-31"
 Description: >
   test-apis
 
+# Parameters are populated atm with the default values
 Parameters:
   Environment:
     Description: Environment to run under
@@ -27,6 +28,7 @@ Mappings:
     prod:
       DependencyUrl: 'http://host.docker.internal:3001/prod/dependency'
 
+# Global function env vars
 Globals:
   Function:
     Environment:
@@ -41,11 +43,18 @@ Globals:
     Layers:
       - !Ref BaseLayer
 
+# Http API Gateway and Resources
 Resources:
-  # http api from openapi spec
+  # http api with routes defined on function events, events are routed through the auth function first
   TestHttpApiv1:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt lambdaAuthorizer.Arn
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -53,7 +62,7 @@ Resources:
             Location: openapi.yaml
       StageName: v1
 
-  # http api from openapi spec
+  # http api with routes defined on function events
   TestHttpApiv2:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -64,7 +73,7 @@ Resources:
             Location: openapi.yaml
       StageName: v2
 
-  # base layer for functions
+  # base layer for functions, this isn't used atm the handlers run against your dev dependencies instead
   BaseLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -77,7 +86,7 @@ Resources:
     Metadata:
       BuildMethod: nodejs14.x
 
-  # a secret from secret manager
+  # a secret from secret manager, we don't do anything with this yet
   EncryptionSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -86,7 +95,7 @@ Resources:
       GenerateSecretString:
         SecretStringTemplate: "{}"
         GenerateStringKey: "secretValue"
-        ExcludeCharacters: '"@/\'
+        ExcludeCharacters: '"@/\\'
 
   # functions
   pathParamTestGet:
@@ -161,6 +170,12 @@ Resources:
             Name: EveryTenMinutes
             Description: Run every 10 minutes
             Enabled: true
+
+  # an authorizer function
+  lambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.authorizer
 
 Outputs:
   TestHttpApiv1:

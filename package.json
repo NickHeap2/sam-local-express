@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -15,8 +15,9 @@
   "scripts": {
     "lint": "standard \"**/*.js\"",
     "pack": "npm pack",
-    "start": "node ./lib/index.js --template template.yaml",
-    "start-single": "node ./lib/index.js --template template.yaml --singleport --baseport 4000"
+    "start": "node ./lib/index.js --template template.yaml --singleport --baseport 4000",
+    "start-multiple": "node ./lib/index.js --template template.yaml",
+    "test": "jest --verbose"
   },
   "author": {
     "name": "Nick Heap",
@@ -26,11 +27,18 @@
   "keywords": [
     "api",
     "api testing",
+    "aws",
     "aws sam",
+    "express",
     "local",
-    "express"
+    "sam",
+    "testing"
   ],
   "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1"
+  },
   "dependencies": {
     "body-parser": "^1.19.1",
     "colors": "^1.4.0",
@@ -45,5 +53,9 @@
     "env": [
       "jest"
     ]
+  },
+  "nodemonConfig": {
+    "ignore": [],
+    "delay": 1000
   }
 }

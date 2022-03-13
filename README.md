@@ -1,5 +1,13 @@
 # sam-local-express
-Local testing of simple AWS SAM templates via Express
+Local testing of simple AWS SAM templates via Express.  
+The aim of this package is to support local testing of simple AWS lambda functions and API gateway defined in an AWS SAM template. Local REQUEST based authorizers are also supported.
+
+## Main packages used
+`express` - routing to the handlers.  
+`lambda-local` - invoking the lambda functions.  
+`nodemon` - watching code for any changes and restarting the server.  
+`yaml-cfn` - parsing the template file.
+
 
 See below for an example of the type of template that this is designed to support
 
@@ -18,17 +26,27 @@ Options:
   -h, --help                     display help for command
 ```
 
-Serve multiple APIs defined in a SAM template with Express servers starting at port 3000
+### Serve multiple APIs defined in a SAM template with Express servers starting at port 3000
 ``` bash
 template-to-express --template template.yaml
 ```
 ![multiple](https://github.com/NickHeap2/sam-local-express/blob/3f84f853a694f8eb6551c664f6f122a25ca35a1c/images/multiple.png)
 
-Serve multiple APIs defined in a SAM template with Express all on port 4000
+### Serve multiple APIs defined in a SAM template with Express all on port 4000
 ``` bash
 template-to-express --template template.yaml --singleport --baseport 4000
 ```
 ![single](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/single.png)
+
+### Watching for changes
+
+You can use standard nodemon config in your package.json to change how the file watching works.
+``` json
+  "nodemonConfig": {
+    "ignore": ["test/*", "docs/*"],
+    "delay": 2500
+  }
+```
 
 ## Example template
 ``` yaml

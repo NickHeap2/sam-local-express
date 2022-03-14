@@ -58,7 +58,6 @@ async function authorizer(event, context, callback) {
   const token = event.headers?.authorization
   event.methodArn = 'arn:aws:lambda:eu-west-2:123456:function:the-function:1'
 
-  console.log(token)
   switch (token) {
       case 'allow':
           callback(null, generatePolicy('user', 'Allow', event.methodArn))

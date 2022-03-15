@@ -1,12 +1,12 @@
 # sam-local-express
 Local testing of simple AWS SAM templates via Express.  
-The aim of this package is to support local testing of simple API gateways with attached AWS lambda functions/authorizors defined in an AWS SAM template.  
+The aim of this package is to support local testing of simple API gateways with attached AWS lambda functions/authorizers defined in an AWS SAM template.  
 SAM start-api should still be used to more accurately verify functionality before deployment.
 
 ## Supported functionality
 * Global environmental variables are populated from parameters and mappings
 * Http and Rest Apis are discovered and served under a single or multiple Express instances
-* Any authorizor lambda function defined in the template is called before the routes
+* Any authorizer lambda function defined in the template is called before the routes
 * Serverless functions with Path, Method and ApiId are attached to the Express instances
 * Routes are built like `http://localhost:3000/{api stage}/{function path}`
 

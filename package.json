@@ -22,7 +22,11 @@
   "author": {
     "name": "Nick Heap",
     "email": "nickheap@gmail.com",
-    "url": "https://github.com/NickHeap2/sam-local-express.git"
+    "url": "https://github.com/NickHeap2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NickHeap2/sam-local-express.git"
   },
   "keywords": [
     "api",

@@ -51,50 +51,53 @@ async function proxyTestGet (event) {
   return response
 }
 
-async function authorizer(event, context, callback) {
+async function authorizer (event, context, callback) {
   console.log('EVENT')
   console.log(util.inspect(event))
 
   const token = event.headers?.authorization
   event.methodArn = 'arn:aws:lambda:eu-west-2:123456:function:the-function:1'
 
+  const unauthorized = 'Unauthorized'
+  const invalidToken = 'Error: Invalid token'
+
   switch (token) {
-      case 'allow':
-          callback(null, generatePolicy('user', 'Allow', event.methodArn))
-          break;
-      case 'deny':
-          callback(null, generatePolicy('user', 'Deny', event.methodArn))
-          break;
-      case 'unauthorized':
-          callback("Unauthorized") // Return a 401 Unauthorized response
-          break
-      default:
-          callback("Error: Invalid token") // Return a 500 Invalid token response
+    case 'allow':
+      callback(null, generatePolicy('user', 'Allow', event.methodArn))
+      break
+    case 'deny':
+      callback(null, generatePolicy('user', 'Deny', event.methodArn))
+      break
+    case 'unauthorized':
+      callback(unauthorized) // Return a 401 Unauthorized response
+      break
+    default:
+      callback(invalidToken) // Return a 500 Invalid token response
   }
 }
 
 // Help function to generate an IAM policy
-var generatePolicy = function(principalId, effect, resource) {
-  var authResponse = {}
-  
+const generatePolicy = function (principalId, effect, resource) {
+  const authResponse = {}
+
   authResponse.principalId = principalId
   if (effect && resource) {
-      var policyDocument = {}
-      policyDocument.Version = '2012-10-17'
-      policyDocument.Statement = []
-      var statementOne = {}
-      statementOne.Action = 'execute-api:Invoke'
-      statementOne.Effect = effect
-      statementOne.Resource = resource
-      policyDocument.Statement[0] = statementOne
-      authResponse.policyDocument = policyDocument
+    const policyDocument = {}
+    policyDocument.Version = '2012-10-17'
+    policyDocument.Statement = []
+    const statementOne = {}
+    statementOne.Action = 'execute-api:Invoke'
+    statementOne.Effect = effect
+    statementOne.Resource = resource
+    policyDocument.Statement[0] = statementOne
+    authResponse.policyDocument = policyDocument
   }
-  
+
   // Optional output with custom properties of the String, Number or Boolean type.
   authResponse.context = {
-      "stringKey": "stringval",
-      "numberKey": 123,
-      "booleanKey": true
+    stringKey: 'stringval',
+    numberKey: 123,
+    booleanKey: true
   }
   return authResponse
 }

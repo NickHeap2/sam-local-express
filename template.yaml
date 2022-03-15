@@ -50,9 +50,9 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       Auth:
-        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
-          MyLambdaRequestAuthorizer:
+          LambdaRequestAuthorizer:
             FunctionPayloadType: REQUEST
             FunctionArn: !GetAtt lambdaAuthorizer.Arn
       DefinitionBody:
@@ -66,12 +66,36 @@ Resources:
   TestHttpApiv2:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        DefaultAuthorizer: SimpleLambdaRequestAuthorizer
+        Authorizers:
+          SimpleLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt simpleLambdaAuthorizer.Arn
+            EnableSimpleResponses: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
           Parameters:
             Location: openapi.yaml
       StageName: v2
+
+  # http api with token authorizer
+  TestHttpApiv3:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: SimpleLambdaRequestAuthorizer
+        Authorizers:
+          SimpleLambdaRequestAuthorizer:
+            FunctionArn: !GetAtt simpleLambdaAuthorizer.Arn
+            EnableSimpleResponses: true
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      StageName: v3
 
   # base layer for functions, this isn't used atm the handlers run against your dev dependencies instead
   BaseLayer:
@@ -127,6 +151,12 @@ Resources:
             Path: /test
             Method: get
             ApiId: !Ref TestHttpApiv2
+        Apiv3:
+          Type: HttpApi
+          Properties:
+            Path: /test
+            Method: get
+            ApiId: !Ref TestHttpApiv3
 
   proxyTestGet:
     Type: AWS::Serverless::Function
@@ -177,12 +207,21 @@ Resources:
     Properties:
       Handler: handlers/v1/index.authorizer
 
+  simpleLambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.simpleAuthorizer
+
 Outputs:
   TestHttpApiv1:
     Description: "API Gateway endpoint URL for test api v1"
     Value:
-      Fn::Sub: https://${TestHttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1
+      Fn::Sub: https://${TestHttpApiv1}.execute-api.${AWS::Region}.amazonaws.com/v1
   TestHttpApiv2:
     Description: "API Gateway endpoint URL for test api v2"
     Value:
-      Fn::Sub: https://${TestHttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1
+      Fn::Sub: https://${TestHttpApiv2}.execute-api.${AWS::Region}.amazonaws.com/v2
+  TestHttpApiv3:
+    Description: "API Gateway endpoint URL for test api v3"
+    Value:
+      Fn::Sub: https://${TestHttpApiv3}.execute-api.${AWS::Region}.amazonaws.com/v3

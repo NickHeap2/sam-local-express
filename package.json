@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.16",
+  "version": "0.0.20",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -16,6 +16,7 @@
     "lint": "standard \"**/*.js\"",
     "pack": "npm pack",
     "start": "node ./lib/index.js --template template.yaml --singleport --baseport 4000",
+    "debug": "node --inspect-brk ./lib/index.js --template template.yaml --singleport --baseport 4000",
     "start-multiple": "node ./lib/index.js --template template.yaml",
     "test": "jest --verbose"
   },

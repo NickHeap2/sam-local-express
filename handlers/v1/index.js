@@ -6,7 +6,8 @@ module.exports = {
   scheduledPost,
   pathParamTestGet,
   proxyTestGet,
-  authorizer
+  authorizer,
+  simpleAuthorizer
 }
 
 async function testGet (event) {
@@ -49,6 +50,32 @@ async function proxyTestGet (event) {
 
   const response = getResponse('proxyTestGet')
   return response
+}
+
+async function simpleAuthorizer (event, context) {
+  console.log('EVENT')
+  console.log(util.inspect(event))
+
+  let token
+  if (event.type === 'TOKEN') {
+    token = event.authorizationToken
+  } else {
+    token = event.headers?.authorization
+  }
+
+  let isAuthorized
+  switch (token) {
+    case 'allow':
+      isAuthorized = true
+      break
+    case 'deny':
+    default:
+      isAuthorized = false
+  }
+
+  return {
+    isAuthorized: isAuthorized
+  }
 }
 
 async function authorizer (event, context, callback) {

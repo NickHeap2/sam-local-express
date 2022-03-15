@@ -1,6 +1,14 @@
 # sam-local-express
 Local testing of simple AWS SAM templates via Express.  
-The aim of this package is to support local testing of simple AWS lambda functions and API gateway defined in an AWS SAM template. Local REQUEST based authorizers are also supported.
+The aim of this package is to support local testing of simple API gateways with attached AWS lambda functions/authorizors defined in an AWS SAM template.  
+SAM start-api should still be used to more accurately verify functionality before deployment.
+
+## Supported functionality
+* Global environmental variables are populated from parameters and mappings
+* Http and Rest Apis are discovered and served under a single or multiple Express instances
+* Any authorizor lambda function defined in the template is called before the routes
+* Serverless functions with Path, Method and ApiId are attached to the Express instances
+* Routes are built like `http://localhost:3000/{api stage}/{function path}`
 
 ## Main packages used
 `express` - routing to the handlers.  
@@ -11,6 +19,28 @@ The aim of this package is to support local testing of simple AWS lambda functio
 
 See below for an example of the type of template that this is designed to support
 
+
+## Installing
+### Globally
+``` bash
+npm install --global sam-local-express
+```
+Then you can use it like this
+``` bash
+sam-local-express --template template.yaml
+```
+
+### Project level
+``` bash
+npm install --save-dev sam-local-express
+```
+Then you can use like this in your package.json
+``` json
+  "scripts": {
+    "sam-local-express": "node ./node_modules/sam-local-express --template template.yaml",
+    "sam-local-express-debug": "node --inspect-brk ./node_modules/sam-local-express --template template.yaml"
+  }
+```
 ## Usage
 
 Use --help to get a list of options
@@ -33,10 +63,19 @@ sam-local-express --template template.yaml
 ![multiple](https://github.com/NickHeap2/sam-local-express/blob/3f84f853a694f8eb6551c664f6f122a25ca35a1c/images/multiple.png)
 
 ### Serve multiple APIs defined in a SAM template with Express all on port 4000
+Use the command below and then attach the debugger from VS Code
 ``` bash
 sam-local-express --template template.yaml --singleport --baseport 4000
 ```
 ![single](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/single.png)
+
+### Debug APIs defined in a SAM template with Express all on port 4000
+
+``` bash
+sam-local-express --inspect-brk --template template.yaml --singleport --baseport 4000
+```
+![single](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/single.png)
+
 
 ### Watching for changes
 
@@ -233,9 +272,9 @@ Outputs:
   TestHttpApiv1:
     Description: "API Gateway endpoint URL for test api v1"
     Value:
-      Fn::Sub: https://${TestHttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1
+      Fn::Sub: https://${TestHttpApiv1}.execute-api.${AWS::Region}.amazonaws.com/v1
   TestHttpApiv2:
     Description: "API Gateway endpoint URL for test api v2"
     Value:
-      Fn::Sub: https://${TestHttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1
+      Fn::Sub: https://${TestHttpApiv2}.execute-api.${AWS::Region}.amazonaws.com/v2
 ```

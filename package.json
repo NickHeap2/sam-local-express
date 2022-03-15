@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.13",
+  "version": "0.0.16",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -53,9 +53,5 @@
     "env": [
       "jest"
     ]
-  },
-  "nodemonConfig": {
-    "ignore": [],
-    "delay": 1000
   }
 }

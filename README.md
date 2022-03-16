@@ -1,7 +1,7 @@
 # sam-local-express
 Local testing of simple AWS SAM templates via Express.  
 The aim of this package is to support local testing of simple API gateways with attached AWS lambda functions/authorizers defined in an AWS SAM template.  
-SAM start-api should still be used to more accurately verify functionality before deployment.
+SAM start-api should still be used to more accurately verify functionality before deployment.  
 
 ## Supported functionality
 * Global environmental variables are populated from parameters and mappings
@@ -34,11 +34,16 @@ sam-local-express --template template.yaml
 ``` bash
 npm install --save-dev sam-local-express
 ```
-Then you can use like this in your package.json
+
+Then you can use it like this in your package.json
 ``` json
   "scripts": {
-    "sam-local-express": "node ./node_modules/sam-local-express --template template.yaml"
+    "sam-local-express": "sam-local-express --template template.yaml"
   }
+```
+Or from the terminal like this
+``` bash
+npx sam-local-express --template template.yaml
 ```
 
 Details of how to debug your serverless functions is found under `Debug APIs defined in a SAM template with Express all on port 4000`.
@@ -75,7 +80,7 @@ sam-local-express --template template.yaml --singleport --baseport 4000
 
 There are two ways to debug your APIs:
 
-The best way is to use Launch via npm option in VS Code by adding through the UI or setting your .vscode/launch.json to the below
+The best way is to use the 'Run "npm start" in a debug terminal' option in VS Code by adding through the Add configuration Debug UI or setting your .vscode/launch.json to the below
 ``` json
 {
   // Use IntelliSense to learn about possible attributes.
@@ -84,17 +89,10 @@ The best way is to use Launch via npm option in VS Code by adding through the UI
   "version": "0.2.0",
   "configurations": [
     {
+      "command": "npm run sam-local-express",
       "name": "sam-local-express",
       "request": "launch",
-      "runtimeArgs": [
-        "run-script",
-        "sam-local-express"
-      ],
-      "runtimeExecutable": "npm",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "pwa-node"
+      "type": "node-terminal"
     }
   ]
 }

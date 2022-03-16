@@ -37,10 +37,12 @@ npm install --save-dev sam-local-express
 Then you can use like this in your package.json
 ``` json
   "scripts": {
-    "sam-local-express": "node ./node_modules/sam-local-express --template template.yaml",
-    "sam-local-express-debug": "node --inspect-brk ./node_modules/sam-local-express --template template.yaml"
+    "sam-local-express": "node ./node_modules/sam-local-express --template template.yaml"
   }
 ```
+
+Details of how to debug your serverless functions is found under `Debug APIs defined in a SAM template with Express all on port 4000`.
+
 ## Usage
 
 Use --help to get a list of options
@@ -71,11 +73,42 @@ sam-local-express --template template.yaml --singleport --baseport 4000
 
 ### Debug APIs defined in a SAM template with Express all on port 4000
 
+There are two ways to debug your APIs:
+
+The best way is to use Launch via npm option in VS Code by adding through the UI or setting your .vscode/launch.json to the below
+``` json
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "sam-local-express",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "sam-local-express"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    }
+  ]
+}
+```
+
+The other way is to use --inspect-brk on the command line
 ``` bash
 sam-local-express --inspect-brk --template template.yaml --singleport --baseport 4000
 ```
-![single](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/single.png)
-
+or in your package.json
+``` json
+    "sam-local-express-debug": "node --inspect-brk ./node_modules/sam-local-express --template template.yaml"
+```
+Then attach to the session via Attach in VS Code. The problem with this is that you have to hit continue in two files of the package before continuing to your own code.
 
 ### Watching for changes
 

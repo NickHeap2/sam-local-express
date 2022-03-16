@@ -70,9 +70,11 @@ Resources:
         DefaultAuthorizer: SimpleLambdaRequestAuthorizer
         Authorizers:
           SimpleLambdaRequestAuthorizer:
-            FunctionPayloadType: REQUEST
             FunctionArn: !GetAtt simpleLambdaAuthorizer.Arn
             EnableSimpleResponses: true
+            Identity:
+              Headers:
+                - Authorization
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include

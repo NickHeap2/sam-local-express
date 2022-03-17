@@ -6,16 +6,17 @@ SAM start-api should still be used to more accurately verify functionality befor
 ## Supported functionality
 * Global environmental variables are populated from parameters and mappings
 * Http and Rest Apis are discovered and served under a single or multiple Express instances
+* Cors rules are applied from global and api level settings
 * Any authorizer lambda function defined in the template is called before the routes
 * Serverless functions with Path, Method and ApiId are attached to the Express instances
 * Routes are built like `http://localhost:3000/{api stage}/{function path}`
 
 ## Main packages used
+`cors` - cors configuration.  
 `express` - routing to the handlers.  
 `lambda-local` - invoking the lambda functions.  
 `nodemon` - watching code for any changes and restarting the server.  
 `yaml-cfn` - parsing the template file.
-
 
 See below for an example of the type of template that this is designed to support
 
@@ -144,14 +145,17 @@ Parameters:
 Mappings:
   Environments:
     local:
-      DependencyUrl: 'http://host.docker.internal:3001/local/dependency'
+      DependencyUrl: 'http://localhost:3001/local/dependency'
     qa:
-      DependencyUrl: 'http://host.docker.internal:3001/qa/dependency'
+      DependencyUrl: 'http://localhost:3001/qa/dependency'
     prod:
-      DependencyUrl: 'http://host.docker.internal:3001/prod/dependency'
+      DependencyUrl: 'http://localhost:3001/prod/dependency'
 
 # Global function env vars
 Globals:
+  Api:
+    Cors:
+      AllowMethods: 'OPTIONS'
   Function:
     Environment:
       Variables:
@@ -172,11 +176,12 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       Auth:
-        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
-          MyLambdaRequestAuthorizer:
+          LambdaRequestAuthorizer:
             FunctionPayloadType: REQUEST
             FunctionArn: !GetAtt lambdaAuthorizer.Arn
+      CorsConfiguration: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -188,12 +193,77 @@ Resources:
   TestHttpApiv2:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Auth:
+        DefaultAuthorizer: SimpleLambdaRequestAuthorizer
+        Authorizers:
+          SimpleLambdaRequestAuthorizer:
+            FunctionArn: !GetAtt simpleLambdaAuthorizer.Arn
+            EnableSimpleResponses: true
+            Identity:
+              Headers:
+                - Authorization
+      CorsConfiguration: 'localhost'
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
           Parameters:
             Location: openapi.yaml
       StageName: v2
+
+  # http api with token authorizer
+  TestHttpApiv3:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: SimpleLambdaRequestAuthorizer
+        Authorizers:
+          SimpleLambdaRequestAuthorizer:
+            FunctionArn: !GetAtt simpleLambdaAuthorizer.Arn
+            EnableSimpleResponses: true
+      CorsConfiguration: true
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      StageName: v3
+
+  # http api with external authorizer that will be ignored
+  TestHttpApiv4:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: ExternalAuthorizer
+        Authorizers:
+          ExternalAuthorizer:
+            FunctionArn:
+              Fn::ImportValue: ExternalAuthorizer
+            EnableSimpleResponses: true
+      CorsConfiguration: true
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      StageName: v4
+
+  # http api with no auth and cors
+  TestHttpApiv5:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowCredentials: true
+        AllowHeaders: 'Authorization, *'
+        AllowMethods: 'GET, POST, DELETE, *'
+        AllowOrigins: 'http://localhost, https://stackoverflow.com'
+        ExposeHeaders: 'Date, x-api-id'
+        MaxAge: 100
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      StageName: v5
 
   # base layer for functions, this isn't used atm the handlers run against your dev dependencies instead
   BaseLayer:
@@ -237,11 +307,17 @@ Resources:
     Properties:
       Handler: handlers/v1/index.testGet
       Events:
-        Apiv1:
+        Apiv1Get:
           Type: HttpApi
           Properties:
             Path: /test
             Method: get
+            ApiId: !Ref TestHttpApiv1
+        Apiv1Delete:
+          Type: HttpApi
+          Properties:
+            Path: /test
+            Method: delete
             ApiId: !Ref TestHttpApiv1
         Apiv2:
           Type: HttpApi
@@ -249,6 +325,18 @@ Resources:
             Path: /test
             Method: get
             ApiId: !Ref TestHttpApiv2
+        Apiv3:
+          Type: HttpApi
+          Properties:
+            Path: /test
+            Method: get
+            ApiId: !Ref TestHttpApiv3
+        Apiv5:
+          Type: HttpApi
+          Properties:
+            Path: /test
+            Method: get
+            ApiId: !Ref TestHttpApiv5
 
   proxyTestGet:
     Type: AWS::Serverless::Function
@@ -299,6 +387,11 @@ Resources:
     Properties:
       Handler: handlers/v1/index.authorizer
 
+  simpleLambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.simpleAuthorizer
+
 Outputs:
   TestHttpApiv1:
     Description: "API Gateway endpoint URL for test api v1"
@@ -308,4 +401,12 @@ Outputs:
     Description: "API Gateway endpoint URL for test api v2"
     Value:
       Fn::Sub: https://${TestHttpApiv2}.execute-api.${AWS::Region}.amazonaws.com/v2
+  TestHttpApiv3:
+    Description: "API Gateway endpoint URL for test api v3"
+    Value:
+      Fn::Sub: https://${TestHttpApiv3}.execute-api.${AWS::Region}.amazonaws.com/v3
+  TestHttpApiv4:
+    Description: "API Gateway endpoint URL for test api v4"
+    Value:
+      Fn::Sub: https://${TestHttpApiv4}.execute-api.${AWS::Region}.amazonaws.com/v4
 ```

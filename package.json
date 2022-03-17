@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.24",
+  "version": "0.0.27",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -17,7 +17,7 @@
     "pack": "npm pack",
     "start": "node ./lib/index.js --template template.yaml --singleport --baseport 4000",
     "debug": "node --inspect-brk ./lib/index.js --template template.yaml --singleport --baseport 4000",
-    "start-multiple": "node ./lib/index.js --template template.yaml",
+    "start-multiple": "node ./lib/index.js --template template.yaml --baseport 4000",
     "test": "jest --verbose"
   },
   "author": {
@@ -42,6 +42,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "cors": "^2.8.5",
     "jest": "^27.5.1"
   },
   "dependencies": {

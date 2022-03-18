@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -42,13 +42,13 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^27.4.1",
-    "cors": "^2.8.5",
     "jest": "^27.5.1"
   },
   "dependencies": {
     "body-parser": "^1.19.1",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "lambda-local": "^2.0.0",
     "nodemon": "^2.0.15",

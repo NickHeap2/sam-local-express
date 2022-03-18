@@ -20,7 +20,6 @@ SAM start-api should still be used to more accurately verify functionality befor
 
 See below for an example of the type of template that this is designed to support
 
-
 ## Installing
 ### Globally
 ``` bash
@@ -409,4 +408,8 @@ Outputs:
     Description: "API Gateway endpoint URL for test api v4"
     Value:
       Fn::Sub: https://${TestHttpApiv4}.execute-api.${AWS::Region}.amazonaws.com/v4
+  TestHttpApiv5:
+    Description: "API Gateway endpoint URL for test api v5"
+    Value:
+      Fn::Sub: https://${TestHttpApiv5}.execute-api.${AWS::Region}.amazonaws.com/v5
 ```

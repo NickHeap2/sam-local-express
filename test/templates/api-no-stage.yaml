@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: "AWS::Serverless-2016-10-31"
+Description: >
+  test-apis
+
+# Http API Gateway and Resources
+Resources:
+  # http api with routes defined on function events, events are routed through the auth function first
+  TestHttpApiv1:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: LambdaRequestAuthorizer
+        Authorizers:
+          LambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt lambdaAuthorizer.Arn
+      CorsConfiguration: true
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      StageName:
+
+  pathParamTestGet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.pathParamTestGet
+      Events:
+        Apiv1:
+          Type: HttpApi
+          Properties:
+            Path: /{pathParam}/test/
+            Method: get
+            ApiId: !Ref TestHttpApiv1

@@ -168,14 +168,14 @@ describe('lambda-invoker', () => {
   it('can call an invoker with object auth response authorized not simple', async () => {
     lambdaLocal.execute
       .mockReturnValueOnce({
-          policyDocument: {
-            Statement: [
-              {
-                Effect: 'Deny'
-              }
-            ]
-          }
-        })
+        policyDocument: {
+          Statement: [
+            {
+              Effect: 'Deny'
+            }
+          ]
+        }
+      })
 
     const authHandler = {
       name: './handlers/v1/index.simpleAuthorizer',

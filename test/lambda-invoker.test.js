@@ -1,11 +1,10 @@
-// const express = require('express')
 const lambdaLocal = require('lambda-local')
 
 jest.mock('lambda-local', () => {
-  const lambdaLocal = {
+  const lambdaLocalMock = {
     execute: jest.fn()
   }
-  return lambdaLocal
+  return lambdaLocalMock
 })
 
 global.console = {

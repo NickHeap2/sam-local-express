@@ -60,7 +60,7 @@ async function simpleAuthorizer (event, context) {
   if (event.type === 'TOKEN') {
     token = event.authorizationToken
   } else {
-    token = event.headers?.authorization
+    token = event.headers ? event.headers.authorization : undefined
   }
 
   let isAuthorized
@@ -82,7 +82,7 @@ async function authorizer (event, context, callback) {
   console.log('EVENT')
   console.log(util.inspect(event))
 
-  const token = event.headers?.authorization
+  const token = event.headers ? event.headers.authorization : undefined
   event.methodArn = 'arn:aws:lambda:eu-west-2:123456:function:the-function:1'
 
   const unauthorized = 'Unauthorized'

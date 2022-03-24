@@ -7,7 +7,8 @@ module.exports = {
   pathParamTestGet,
   proxyTestGet,
   authorizer,
-  simpleAuthorizer
+  simpleAuthorizer,
+  doublePathParamTestGet
 }
 
 async function testGet (event) {
@@ -40,6 +41,17 @@ async function pathParamTestGet (event) {
 
   const response = getResponse('pathParamTestGet')
   response.body = response.body.replace('OK', pathParameters.pathParam)
+
+  return response
+}
+
+async function doublePathParamTestGet (event) {
+  console.log('EVENT')
+  console.log(util.inspect(event))
+  const pathParameters = event.pathParameters
+
+  const response = getResponse('pathParamTestGet')
+  response.body = response.body.replace('OK', pathParameters.pathParam1 + ' & ' + pathParameters.pathParam2)
 
   return response
 }

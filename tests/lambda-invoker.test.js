@@ -1,4 +1,5 @@
 const lambdaLocal = require('lambda-local')
+const path = require('path')
 
 jest.mock('lambda-local', () => {
   const lambdaLocalMock = {
@@ -58,6 +59,11 @@ const mockResponse = () => {
   return response
 }
 
+const testGetHandlerName = './handlers/v1/index.testGet'
+const testGetHandlerPath = path.join(__dirname, '../handlers/v1/index')
+
+const simpleAuthorizerHandlerName = './handlers/v1/index.simpleAuthorizer'
+
 describe('lambda-invoker', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -68,8 +74,8 @@ describe('lambda-invoker', () => {
       hasAuthorizer: false
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler)
@@ -90,8 +96,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
@@ -116,8 +122,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
@@ -140,8 +146,8 @@ describe('lambda-invoker', () => {
       })
 
     const authHandler = {
-      name: './handlers/v1/index.simpleAuthorizer',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: simpleAuthorizerHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const auth = {
@@ -152,8 +158,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
@@ -177,8 +183,8 @@ describe('lambda-invoker', () => {
       })
 
     const authHandler = {
-      name: './handlers/v1/index.simpleAuthorizer',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: simpleAuthorizerHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const auth = {
@@ -189,8 +195,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
@@ -208,8 +214,8 @@ describe('lambda-invoker', () => {
       })
 
     const authHandler = {
-      name: './handlers/v1/index.simpleAuthorizer',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: simpleAuthorizerHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const auth = {
@@ -220,8 +226,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
@@ -237,8 +243,8 @@ describe('lambda-invoker', () => {
       .mockReturnValueOnce('Unauthorized')
 
     const authHandler = {
-      name: './handlers/v1/index.simpleAuthorizer',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: simpleAuthorizerHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const auth = {
@@ -249,8 +255,8 @@ describe('lambda-invoker', () => {
     const invokeOpts = {
     }
     const routeHandler = {
-      name: './handlers/v1/index.testGet',
-      path: 'S:\\Workspaces\\sam-local-express\\handlers\\v1\\index',
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
       method: 'testGet'
     }
     const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)

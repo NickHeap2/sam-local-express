@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.31",
+  "version": "0.0.35",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {
@@ -42,7 +42,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^27.4.1",
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "standard": "^16.0.4"
   },
   "dependencies": {
     "body-parser": "^1.19.1",
@@ -52,15 +53,13 @@
     "express": "^4.17.1",
     "lambda-local": "^2.0.0",
     "nodemon": "^2.0.15",
-    "standard": "^16.0.4",
     "yaml-cfn": "^0.3.1"
   },
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
       "lib/*.js",
-      "!lib/index.js",
-      "!lib/server.js"
+      "!tests/**"
     ],
     "coverageThreshold": {
       "global": {

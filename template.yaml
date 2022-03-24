@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: "AWS::Serverless-2016-10-31"
 Description: >
@@ -22,11 +23,15 @@ Parameters:
 Mappings:
   Environments:
     local:
-      DependencyUrl: 'http://localhost:3001/local/dependency'
+      DependencyUrl: 'http://host.docker.internal:3001/local/dependency'
     qa:
-      DependencyUrl: 'http://localhost:3001/qa/dependency'
+      DependencyUrl: 'http://172.17.0.1:3001/qa/dependency'
     prod:
-      DependencyUrl: 'http://localhost:3001/prod/dependency'
+      DependencyUrl: 'http://my.server.com:3001/prod/dependency'
+
+# apply some conditions
+Conditions:
+  LocalEnvironment: !Equals [ !Ref Environment, 'local' ]
 
 # Global function env vars
 Globals:
@@ -37,6 +42,11 @@ Globals:
     Environment:
       Variables:
         DEPENDENCY_URL: !FindInMap [Environments, !Ref Environment, DependencyUrl]
+        DEPENDENCY_URL_IF: !If [
+          IsLocal,
+          !FindInMap [systems, !Ref LocalSystem, MosaicDataBaseUrl],
+          !FindInMap [environments, !Ref Environment, MosaicDataBaseUrl]
+        ]
         MY_PARAMETER_VARIABLE:
           Ref: PassedInParameter
         MY_SECRET:
@@ -48,7 +58,8 @@ Globals:
 
 # Http API Gateway and Resources
 Resources:
-  # http api with routes defined on function events, events are routed through the auth function first
+  # http api with routes defined on function events,
+  # events are routed through the auth function first
   TestHttpApiv1:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -176,6 +187,18 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /{pathParam}/test/
+            Method: get
+            ApiId: !Ref TestHttpApiv1
+
+  doublePathParamTestGet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.doublePathParamTestGet
+      Events:
+        Apiv1:
+          Type: HttpApi
+          Properties:
+            Path: /{pathParam1}/test/{pathParam2}/testagain
             Method: get
             ApiId: !Ref TestHttpApiv1
 

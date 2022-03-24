@@ -3,10 +3,20 @@ const express = require('express')
 
 jest.mock('express', () => {
   return jest.fn(() => {
+    const serverMock = {
+      routes: []
+    }
     return {
-      get: jest.fn(),
-      post: jest.fn(),
-      delete: jest.fn(),
+      routes: serverMock.routes,
+      get: jest.fn((path) => {
+        serverMock.routes.push(path)
+      }),
+      post: jest.fn((path) => {
+        serverMock.routes.push(path)
+      }),
+      delete: jest.fn((path) => {
+        serverMock.routes.push(path)
+      }),
       use: jest.fn(),
       listen: jest.fn()
     }
@@ -19,6 +29,7 @@ global.console = {
   error: jest.fn()
 }
 
+const templateLoader = require('../lib/template-loader')
 const templateParser = require('../lib/template-parser')
 const serverProcess = require('../lib/server-process')
 
@@ -28,7 +39,8 @@ describe('server-process', () => {
   })
 
   it('should serve a no apis template', () => {
-    const parseResult = templateParser.parseFile('./test/templates/no-apis.yaml')
+    const template = templateLoader.loadFile('./tests/templates/no-apis.yaml')
+    const parseResult = templateParser.parseTemplate(template)
     expect(parseResult).toBeDefined()
     parseResult.singlePort = 'true'
     parseResult.basePort = 3000
@@ -38,7 +50,9 @@ describe('server-process', () => {
   })
 
   it('should serve an api with no stage', () => {
-    const parseResult = templateParser.parseFile('./test/templates/api-no-stage.yaml')
+    const template = templateLoader.loadFile('./tests/templates/api-no-stage.yaml')
+    const parseResult = templateParser.parseTemplate(template)
+
     expect(parseResult).toBeDefined()
     parseResult.singlePort = 'true'
     parseResult.basePort = 3000
@@ -49,7 +63,9 @@ describe('server-process', () => {
   })
 
   it('should serve an api with missing handler', () => {
-    const parseResult = templateParser.parseFile('./test/templates/api-missing-handler.yaml')
+    const template = templateLoader.loadFile('./tests/templates/api-missing-handler.yaml')
+    const parseResult = templateParser.parseTemplate(template)
+
     expect(parseResult).toBeDefined()
     parseResult.singlePort = 'true'
     parseResult.basePort = 3000
@@ -60,7 +76,9 @@ describe('server-process', () => {
   })
 
   it('should serve a complex template on single port', () => {
-    const parseResult = templateParser.parseFile('./template.yaml')
+    const template = templateLoader.loadFile('./template.yaml')
+    const parseResult = templateParser.parseTemplate(template)
+
     expect(parseResult).toBeDefined()
     parseResult.singlePort = true
     parseResult.basePort = 3000
@@ -68,10 +86,23 @@ describe('server-process', () => {
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(1)
     expect(servers[0].listen).toHaveBeenCalledTimes(1)
+
+    expect(servers[0].routes[0]).toEqual('/v1/:pathParam/test/')
+    expect(servers[0].routes[1]).toEqual('/v1/:pathParam1/test/:pathParam2/testagain')
+    expect(servers[0].routes[2]).toEqual('/v1/test')
+    expect(servers[0].routes[3]).toEqual('/v1/test')
+    expect(servers[0].routes[4]).toEqual('/v1/proxy/:proxy*')
+    expect(servers[0].routes[5]).toEqual('/v2/test')
+    expect(servers[0].routes[6]).toEqual('/v2/test')
+    expect(servers[0].routes[7]).toEqual('/v2/scheduled')
+    expect(servers[0].routes[8]).toEqual('/v3/test')
+    expect(servers[0].routes[9]).toEqual('/v5/test')
   })
 
   it('should serve a complex template on multiple ports', () => {
-    const parseResult = templateParser.parseFile('./template.yaml')
+    const template = templateLoader.loadFile('./template.yaml')
+    const parseResult = templateParser.parseTemplate(template)
+
     expect(parseResult).toBeDefined()
     parseResult.singlePort = false
     parseResult.basePort = 3000

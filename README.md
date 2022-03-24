@@ -4,12 +4,19 @@ The aim of this package is to support local testing of simple API gateways with 
 SAM start-api should still be used to more accurately verify functionality before deployment.  
 
 ## Supported functionality
-* Global environmental variables are populated from parameters and mappings
+* The values `172.17.0.1` and `host.docker.internal` are replaced in your template with `localhost`
+* The functions `Equals`, `If`, `Not` and `FindInMap` are processed for conditions and environmental variables (`And` and `Or` are not yet)
+* Conditions are evaluated from parameters and mappings
+* Global environmental variables are populated from parameters, mappings and conditions
 * Http and Rest Apis are discovered and served under a single or multiple Express instances
 * Cors rules are applied from global and api level settings
 * Any authorizer lambda function defined in the template is called before the routes
 * Serverless functions with Path, Method and ApiId are attached to the Express instances
 * Routes are built like `http://localhost:3000/{api stage}/{function path}`
+
+## Functionality that will be supported in the future
+* `And` and `Or` function processing
+* Environmental variables defined at the function level
 
 ## Main packages used
 `cors` - cors configuration.  
@@ -60,6 +67,7 @@ Options:
   -e, --extensions [extensions]  Comma separated list of file extensions to watch (default: "js,json,yaml")
   -s, --singleport               If set then all APIs will be served on a single port, use stages to separate (default: false)
   -b, --baseport [portnumber]    The base port for Express servers (default: 3000)
+  -a, --noauth                   Don't attach authorisers (default: false)
   -h, --help                     display help for command
 ```
 
@@ -70,11 +78,15 @@ sam-local-express --template template.yaml
 ![multiple](https://github.com/NickHeap2/sam-local-express/blob/3f84f853a694f8eb6551c664f6f122a25ca35a1c/images/multiple.png)
 
 ### Serve multiple APIs defined in a SAM template with Express all on port 4000
-Use the command below and then attach the debugger from VS Code
 ``` bash
 sam-local-express --template template.yaml --singleport --baseport 4000
 ```
 ![single](https://github.com/NickHeap2/sam-local-express/blob/123c930c7725d2927f52fde5ba69708857b65fe4/images/single.png)
+
+### Serve multiple APIs defined in a SAM template with Express all on port 4000 and don't attach any auth function
+``` bash
+sam-local-express --template template.yaml --singleport --baseport 4000 --noauth
+```
 
 ### Debug APIs defined in a SAM template with Express all on port 4000
 
@@ -120,6 +132,7 @@ You can use standard nodemon config in your package.json to change how the file 
 
 ## Example template
 ``` yaml
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: "AWS::Serverless-2016-10-31"
 Description: >
@@ -135,6 +148,13 @@ Parameters:
       - "local"
       - "qa"
       - "prod"
+  LocalEnvironmentType:
+    Description: Type of Local Environment to run under
+    Type: String
+    Default: "one"
+    AllowedValues:
+      - "one"
+      - "two"
   PassedInParameter:
     Description: An example parameter passed into the template
     Type: String
@@ -142,13 +162,23 @@ Parameters:
 
 # Environment mapped variables
 Mappings:
+  LocalEnvironmentSettings:
+    one:
+      DependencyUrl: 'http://172.17.0.1:3001/local/one/dependency'
+    two:
+      DependencyUrl: 'http://host.docker.internal:3001/local/two/dependency'
   Environments:
     local:
-      DependencyUrl: 'http://localhost:3001/local/dependency'
+      DependencyUrl: 'http://host.docker.internal:3001/local/dependency'
     qa:
-      DependencyUrl: 'http://localhost:3001/qa/dependency'
+      DependencyUrl: 'http://172.17.0.1:3001/qa/dependency'
     prod:
-      DependencyUrl: 'http://localhost:3001/prod/dependency'
+      DependencyUrl: 'http://my.server.com:3001/prod/dependency'
+
+# apply some conditions
+Conditions:
+  LocalEnvironment: !Equals [ !Ref Environment, 'local' ]
+  NotLocalEnvironment: !Not [ !Equals [ !Ref Environment, 'local' ] ]
 
 # Global function env vars
 Globals:
@@ -159,6 +189,12 @@ Globals:
     Environment:
       Variables:
         DEPENDENCY_URL: !FindInMap [Environments, !Ref Environment, DependencyUrl]
+        # the if will get resolved
+        DEPENDENCY_URL_IF: !If [
+          LocalEnvironment,
+          !FindInMap [LocalEnvironmentSettings, !Ref LocalEnvironmentType, DependencyUrl],
+          !FindInMap [Environments, !Ref Environment, DependencyUrl]
+        ]
         MY_PARAMETER_VARIABLE:
           Ref: PassedInParameter
         MY_SECRET:
@@ -170,7 +206,8 @@ Globals:
 
 # Http API Gateway and Resources
 Resources:
-  # http api with routes defined on function events, events are routed through the auth function first
+  # http api with routes defined on function events,
+  # events are routed through the auth function first
   TestHttpApiv1:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -298,6 +335,18 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /{pathParam}/test/
+            Method: get
+            ApiId: !Ref TestHttpApiv1
+
+  doublePathParamTestGet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/v1/index.doublePathParamTestGet
+      Events:
+        Apiv1:
+          Type: HttpApi
+          Properties:
+            Path: /{pathParam1}/test/{pathParam2}/testagain
             Method: get
             ApiId: !Ref TestHttpApiv1
 

@@ -14,6 +14,13 @@ Parameters:
       - "local"
       - "qa"
       - "prod"
+  LocalEnvironmentType:
+    Description: Type of Local Environment to run under
+    Type: String
+    Default: "one"
+    AllowedValues:
+      - "one"
+      - "two"
   PassedInParameter:
     Description: An example parameter passed into the template
     Type: String
@@ -21,6 +28,11 @@ Parameters:
 
 # Environment mapped variables
 Mappings:
+  LocalEnvironmentSettings:
+    one:
+      DependencyUrl: 'http://172.17.0.1:3001/local/one/dependency'
+    two:
+      DependencyUrl: 'http://host.docker.internal:3001/local/two/dependency'
   Environments:
     local:
       DependencyUrl: 'http://host.docker.internal:3001/local/dependency'
@@ -32,6 +44,7 @@ Mappings:
 # apply some conditions
 Conditions:
   LocalEnvironment: !Equals [ !Ref Environment, 'local' ]
+  NotLocalEnvironment: !Not [ !Equals [ !Ref Environment, 'local' ] ]
 
 # Global function env vars
 Globals:
@@ -42,10 +55,11 @@ Globals:
     Environment:
       Variables:
         DEPENDENCY_URL: !FindInMap [Environments, !Ref Environment, DependencyUrl]
+        # the if will get resolved
         DEPENDENCY_URL_IF: !If [
-          IsLocal,
-          !FindInMap [systems, !Ref LocalSystem, MosaicDataBaseUrl],
-          !FindInMap [environments, !Ref Environment, MosaicDataBaseUrl]
+          LocalEnvironment,
+          !FindInMap [LocalEnvironmentSettings, !Ref LocalEnvironmentType, DependencyUrl],
+          !FindInMap [Environments, !Ref Environment, DependencyUrl]
         ]
         MY_PARAMETER_VARIABLE:
           Ref: PassedInParameter

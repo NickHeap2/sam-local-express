@@ -33,4 +33,29 @@ describe('template-parser', () => {
     expect(result).toHaveProperty('apis[0].routes[1].path')
     expect(result.apis[0].routes[1].path).toEqual('/{pathParam1}/test/{pathParam2}/testagain')
   })
+
+  it('should resolve equals conditions', () => {
+    const template = templateLoader.loadFile('./template.yaml')
+    const result = templateParser.parseTemplate(template)
+    expect(result).toBeDefined()
+    expect(result).toHaveProperty('templateDetail.conditions.LocalEnvironment')
+    expect(result.templateDetail.conditions.LocalEnvironment).toEqual(true)
+  })
+
+  it('should resolve not equals conditions', () => {
+    const template = templateLoader.loadFile('./template.yaml')
+    const result = templateParser.parseTemplate(template)
+    expect(result).toBeDefined()
+    expect(result).toHaveProperty('templateDetail.conditions.NotLocalEnvironment')
+    expect(result.templateDetail.conditions.NotLocalEnvironment).toEqual(false)
+  })
+
+  it('should resolve globals', () => {
+    const template = templateLoader.loadFile('./template.yaml')
+    const result = templateParser.parseTemplate(template)
+    expect(result).toBeDefined()
+    expect(result).toHaveProperty('templateDetail.globals[1]')
+    expect(result.templateDetail.globals[1].name).toEqual('DEPENDENCY_URL_IF')
+    expect(result.templateDetail.globals[1].value).toEqual('http://localhost:3001/local/one/dependency')
+  })
 })

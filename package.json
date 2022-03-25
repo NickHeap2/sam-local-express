@@ -1,6 +1,6 @@
 {
   "name": "sam-local-express",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "description": "SAM Template to local Express server",
   "main": "lib/index.js",
   "bin": {

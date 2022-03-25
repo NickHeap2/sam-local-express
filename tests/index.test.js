@@ -78,7 +78,8 @@ describe('index', () => {
       template: noneExistingFile,
       extensions: undefined,
       singleport: undefined,
-      baseport: undefined
+      baseport: undefined,
+      noauth: undefined
     }
 
     await require('../lib/index')
@@ -91,7 +92,7 @@ describe('index', () => {
     expect(mockCommander.program.version).toBeCalledTimes(1)
 
     expect(mockCommander.program.requiredOption).toBeCalledTimes(1)
-    expect(mockCommander.program.option).toBeCalledTimes(3)
+    expect(mockCommander.program.option).toBeCalledTimes(4)
 
     expect(mockCommander.program.parse).toBeCalledTimes(1)
 
@@ -108,7 +109,8 @@ describe('index', () => {
       template: existingFile,
       extensions: undefined,
       singleport: undefined,
-      baseport: undefined
+      baseport: undefined,
+      noauth: undefined
     }
 
     await require('../lib/index')
@@ -121,7 +123,7 @@ describe('index', () => {
     expect(mockCommander.program.version).toBeCalledTimes(1)
 
     expect(mockCommander.program.requiredOption).toBeCalledTimes(1)
-    expect(mockCommander.program.option).toBeCalledTimes(3)
+    expect(mockCommander.program.option).toBeCalledTimes(4)
 
     expect(mockCommander.program.parse).toBeCalledTimes(1)
 

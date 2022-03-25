@@ -42,8 +42,10 @@ describe('server-process', () => {
     const template = templateLoader.loadFile('./tests/templates/no-apis.yaml')
     const parseResult = templateParser.parseTemplate(template)
     expect(parseResult).toBeDefined()
-    parseResult.singlePort = 'true'
-    parseResult.basePort = 3000
+    parseResult.parameters = {
+      singlePort: true,
+      basePort: 3000
+    }
 
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(0)
@@ -54,8 +56,10 @@ describe('server-process', () => {
     const parseResult = templateParser.parseTemplate(template)
 
     expect(parseResult).toBeDefined()
-    parseResult.singlePort = 'true'
-    parseResult.basePort = 3000
+    parseResult.parameters = {
+      singlePort: true,
+      basePort: 3000
+    }
 
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(1)
@@ -67,8 +71,10 @@ describe('server-process', () => {
     const parseResult = templateParser.parseTemplate(template)
 
     expect(parseResult).toBeDefined()
-    parseResult.singlePort = 'true'
-    parseResult.basePort = 3000
+    parseResult.parameters = {
+      singlePort: true,
+      basePort: 3000
+    }
 
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(1)
@@ -80,8 +86,10 @@ describe('server-process', () => {
     const parseResult = templateParser.parseTemplate(template)
 
     expect(parseResult).toBeDefined()
-    parseResult.singlePort = true
-    parseResult.basePort = 3000
+    parseResult.parameters = {
+      singlePort: true,
+      basePort: 3000
+    }
 
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(1)
@@ -104,8 +112,10 @@ describe('server-process', () => {
     const parseResult = templateParser.parseTemplate(template)
 
     expect(parseResult).toBeDefined()
-    parseResult.singlePort = false
-    parseResult.basePort = 3000
+    parseResult.parameters = {
+      singlePort: false,
+      basePort: 3000
+    }
 
     const servers = serverProcess.startServer(parseResult)
     expect(servers.length).toBe(5)

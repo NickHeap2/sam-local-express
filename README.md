@@ -4,6 +4,7 @@ The aim of this package is to support local testing of simple API gateways with 
 SAM start-api should still be used to more accurately verify functionality before deployment.  
 
 [![Node.js CI](https://github.com/NickHeap2/sam-local-express/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/NickHeap2/sam-local-express/actions/workflows/main.yml)
+[![Standardjs](https://github.com/NickHeap2/sam-local-express/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/NickHeap2/sam-local-express/actions/workflows/lint.yml)
 [![CodeQL](https://github.com/NickHeap2/sam-local-express/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NickHeap2/sam-local-express/actions/workflows/codeql-analysis.yml)
 
 ## Supported functionality

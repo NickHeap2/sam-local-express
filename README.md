@@ -3,6 +3,7 @@ Local testing of simple AWS SAM templates via Express.
 The aim of this package is to support local testing of simple API gateways with attached AWS lambda functions/authorizers defined in an AWS SAM template.  
 SAM start-api should still be used to more accurately verify functionality before deployment.  
 
+[![Node.js CI](https://github.com/NickHeap2/sam-local-express/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/NickHeap2/sam-local-express/actions/workflows/main.yml)
 [![CodeQL](https://github.com/NickHeap2/sam-local-express/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NickHeap2/sam-local-express/actions/workflows/codeql-analysis.yml)
 
 ## Supported functionality

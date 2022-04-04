@@ -17,6 +17,7 @@ SAM start-api should still be used to more accurately verify functionality befor
 * Any authorizer lambda function defined in the template is called before the routes
 * Serverless functions with Path, Method and ApiId are attached to the Express instances
 * Routes are built like `http://localhost:3000/{api stage}/{function path}`
+* Any set cookies in the response have `Secure` removed so that they will work with http
 
 ## Functionality that will be supported in the future
 * `And` and `Or` function processing

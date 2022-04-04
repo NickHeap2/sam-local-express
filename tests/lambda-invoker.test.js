@@ -30,7 +30,30 @@ const req = {
   body: {}
 }
 
+const jsonPostReq = {
+  _body: true,
+  headers: {
+    host: 'localhost:4000',
+    accept: 'application/json',
+    'content-type': 'application/json'
+  },
+  url: '/v5/test',
+  method: 'POST',
+  baseUrl: '',
+  originalUrl: '/v5/test',
+  params: {},
+  query: {},
+  body: {
+    testValueOne: 'one',
+    testValueTwo: [
+      'a',
+      'b'
+    ]
+  }
+}
+
 const postReq = {
+  _body: true,
   headers: {
     host: 'localhost:4000',
     accept: 'application/xml',
@@ -47,14 +70,18 @@ const postReq = {
 
 const mockResponse = () => {
   const response = {
-    statusCode: undefined
+    statusCode: undefined,
+    headers: undefined
   }
   response.status = jest.fn().mockImplementation((statusCode) => {
     response.statusCode = statusCode
     return response
   })
   response.json = jest.fn().mockReturnValue(response)
-  response.set = jest.fn().mockReturnValue(response)
+  response.set = jest.fn().mockImplementation((headers) => {
+    response.headers = headers
+    return response
+  })
   response.end = jest.fn().mockReturnValue(response)
   return response
 }
@@ -106,9 +133,86 @@ describe('lambda-invoker', () => {
 
     await invoker(req, res)
     expect(res.statusCode).toEqual(200)
+    expect(lambdaLocal.execute).toHaveBeenCalledTimes(1)
+    expect(lambdaLocal.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: {
+          body: null,
+          cookies: [],
+          headers: {
+            accept: 'application/xml',
+            host: 'localhost:4000'
+          },
+          pathParameters: {},
+          queryStringParameters: {},
+          rawPath: '/v5/test',
+          rawQueryString: undefined,
+          requestContext: {
+            authorizer: '',
+            http: {
+              method: 'GET'
+            }
+          }
+        }
+      })
+    )
   })
 
-  it('can call an invoker without auth for post', async () => {
+  it('can call an invoker and get unsecure cookies', async () => {
+    lambdaLocal.execute
+      .mockReturnValueOnce({
+        statusCode: 200,
+        headers: {
+          'set-cookie': ['MY_COOKIE=eyeyeyeyeye; Secure']
+        },
+        body: JSON.stringify({})
+      })
+
+    const auth = {
+      hasAuthorizer: false
+    }
+    const invokeOpts = {
+    }
+    const routeHandler = {
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
+      method: 'testGet'
+    }
+    const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
+
+    const res = mockResponse()
+
+    await invoker(req, res)
+    expect(res.statusCode).toEqual(200)
+    expect(res.headers).toHaveProperty('set-cookie')
+    expect(res.headers['set-cookie'][0]).toEqual('MY_COOKIE=eyeyeyeyeye')
+
+    expect(lambdaLocal.execute).toHaveBeenCalledTimes(1)
+    expect(lambdaLocal.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: {
+          body: null,
+          cookies: [],
+          headers: {
+            accept: 'application/xml',
+            host: 'localhost:4000'
+          },
+          pathParameters: {},
+          queryStringParameters: {},
+          rawPath: '/v5/test',
+          rawQueryString: undefined,
+          requestContext: {
+            authorizer: '',
+            http: {
+              method: 'GET'
+            }
+          }
+        }
+      })
+    )
+  })
+
+  it('can call an invoker without auth for x-www-form-urlencoded post', async () => {
     lambdaLocal.execute
       .mockReturnValueOnce({
         statusCode: 200,
@@ -131,6 +235,32 @@ describe('lambda-invoker', () => {
     const res = mockResponse()
 
     await invoker(postReq, res)
+    expect(res.statusCode).toEqual(200)
+  })
+
+  it('can call an invoker without auth for json post', async () => {
+    lambdaLocal.execute
+      .mockReturnValueOnce({
+        statusCode: 200,
+        headers: {},
+        body: JSON.stringify({})
+      })
+
+    const auth = {
+      hasAuthorizer: false
+    }
+    const invokeOpts = {
+    }
+    const routeHandler = {
+      name: testGetHandlerName,
+      path: testGetHandlerPath,
+      method: 'testGet'
+    }
+    const invoker = lambdaInvoker.getInvoker(auth, routeHandler, invokeOpts)
+
+    const res = mockResponse()
+
+    await invoker(jsonPostReq, res)
     expect(res.statusCode).toEqual(200)
   })
 

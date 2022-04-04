@@ -23,6 +23,8 @@ describe('index', () => {
     jest.resetModules()
 
     const process = require('process')
+    delete process.env.npm_package_version
+
     mockExit = jest.spyOn(process, 'exit').mockImplementation((exitCode) => {
       throw new Error(exitCode)
     })
@@ -57,12 +59,17 @@ describe('index', () => {
     jest.mock('nodemon', () => {
       mockNodemon.callbacks = []
       mockNodemon.mockImplementation(() => {
-        for (const cb of mockNodemon.callbacks) {
-          cb()
+        for (const callback of mockNodemon.callbacks) {
+          if (callback.event === 'restart') {
+            callback.callbackFunction()
+            callback.callbackFunction(['fileone.js', 'filetwo.js'])
+          } else {
+            callback.callbackFunction()
+          }
         }
       })
-      mockNodemon.on = jest.fn().mockImplementation((event, cb) => {
-        mockNodemon.callbacks.push(cb)
+      mockNodemon.on = jest.fn().mockImplementation((event, callbackFunction) => {
+        mockNodemon.callbacks.push({ event, callbackFunction })
         return mockNodemon
       })
       return mockNodemon
